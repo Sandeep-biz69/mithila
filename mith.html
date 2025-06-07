@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mithila Hosieries </title>
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1341Ar2a7Z4X4IxLLm3Gm4W2_-srlY7yy" type="image/png"> <!-- Added favicon link -->
+    <link href="https://fonts.googleapis.com/css2?family=Albertus+Nova:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            /* Updated gradient colors: Removed yellow */
+            background: linear-gradient(135deg, #478633 0%, #84AA45 100%);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: 900;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        .hero-content p {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            opacity: 0;
+            transform: translateY(50px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .float-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Chapter Sections */
+        .chapter {
+            background: #1a1a1a;
+            position: relative;
+        }
+
+        .chapter:nth-child(even) {
+            background: #2a2a2a;
+        }
+
+        .chapter-content {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .text-content {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+
+        .visual-content {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+
+        .chapter h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chapter p {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        /* Styling for visual-element to hold an image */
+        .visual-element {
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); /* Retain original box-shadow */
+            display: flex; /* To center the image */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-element img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the entire area */
+            border-radius: 20px; /* Match container border-radius */
+        }
+
+        /* Removed the ::before pseudo-element for all visual elements */
+        /*
+        .visual-element::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            backdrop-filter: blur(20px);
+            z-index: 1; 
+        }
+        */
+
+        /* Parallax Background */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120vh;
+            background: radial-gradient(circle at 20% 50%, #ff6b6b 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, #4ecdc4 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, #45b7d1 0%, transparent 50%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* Ending Section */
+        .ending {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            text-align: center;
+            position: relative;
+        }
+
+        .ending-content {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .ending h2 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ending p {
+            font-size: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chapter-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+            
+            .text-content,
+            .visual-content {
+                transform: translateY(50px);
+            }
+            
+            .section {
+                padding: 1rem;
+            }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-image-container {
+            width: 45px;
+            height: 45px;
+            background: #ffffff; /* White background to match header's base color */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .logo-img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+            z-index: 1;
+        }
+
+        .logo-image-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+            z-index: 2;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        }
+
+        .brand-name {
+            font-family: 'Albertus Nova', serif; /* Changed font family */
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #0ea7f4; /* Changed color */
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #2c3e50;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Mobile Dropdown Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 100px 2rem 2rem;
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-menu li {
+            margin: 2rem 0;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.active li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .mobile-menu.active li:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu.active li:nth-child(2) { transition-delay: 0.2s; }
+        .mobile-menu.active li:nth-child(3) { transition-delay: 0.3s; }
+        .mobile-menu.active li:nth-child(4) { transition-delay: 0.4s; }
+
+
+        .mobile-menu a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: block;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu a:hover {
+            color: #ff6b6b;
+            padding-left: 1rem;
+        }
+
+        /* Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 0.8rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .brand-name {
+                font-size: 1.4rem;
+            }
+            
+            .logo-image-container {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        /* WhatsApp icon styling - removed as per request */
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+    <div class="parallax-bg"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="#home" class="logo-container"> <!-- Link to home section -->
+                <div class="logo-image-container">
+                    <img src="https://lh3.googleusercontent.com/d/1341Ar2a7Z4X4IxLLm3Gm4W2_-srlY7yy" alt="Mithila Hosieries Logo" class="logo-img" onerror="this.src='https://placehold.co/45x45/FFFFFF/000000?text=Logo';">
+                </div>
+                <span class="brand-name">Mithila Hosieries</span>
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#about-us-hero">About Us</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+                <div class="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="menu-overlay"></div>
+
+    <div class="mobile-menu">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#about-us-hero">About Us</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+        </ul>
+    </div>
+
+    <section class="section hero" id="home">
+        <div class="floating-elements">
+            <div class="float-circle" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+            <div class="float-circle" style="width: 150px; height: 150px; top: 60%; right: 15%;"></div>
+            <div class="float-circle" style="width: 80px; height: 80px; bottom: 30%; left: 70%;"></div>
+        </div>
+        <div class="hero-content">
+            <h1>The Digital Odyssey</h1>
+            <p>A journey through the evolution of technology, told through the lens of human connection and innovation.</p>
+        </div>
+    </section>
+
+    <section class="section chapter" id="products">
+        <div class="chapter-content">
+            <div class="text-content">
+                <h2>The Dawn</h2>
+                <p>In the beginning, there was darkness. Then came the first spark of digital consciousness - a simple bit of information that would change everything.</p>
+                <p>From vacuum tubes to transistors, humanity began its dance with the machines that would reshape our world.</p>
+            </div>
+            <div class="visual-content">
+                <div class="visual-element"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section chapter">
+        <div class="chapter-content">
+            <div class="visual-content">
+                <div class="visual-element"></div>
+            </div>
+            <div class="text-content">
+                <h2>The Connection</h2>
+                <p>Networks began to form, invisible threads connecting minds across vast distances. The internet was born, not as a tool, but as a new form of consciousness.</p>
+                <p>Suddenly, information flowed like water, and knowledge became democratized in ways never before imagined.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section chapter">
+        <div class="chapter-content">
+            <div class="text-content">
+                <h2>The Mobile Revolution</h2>
+                <p>Power once confined to rooms now fit in our pockets. The smartphone became an extension of ourselves, a digital limb we couldn't imagine living without.</p>
+                <p>With touch, we commanded worlds. With swipes, we navigated infinite possibilities.</p>
+            </div>
+            <div class="visual-content">
+                <div class="visual-element"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section chapter">
+        <div class="chapter-content">
+            <div class="visual-content">
+                <div class="visual-element"></div>
+            </div>
+            <div class="text-content">
+                <h2>The AI Awakening</h2>
+                <p>Then came the minds that learned. Artificial intelligence emerged not as cold calculation, but as digital intuition that could dream, create, and understand.</p>
+                <p>The boundary between human and machine creativity began to blur, opening doors to unprecedented collaboration.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section hero" id="about-us-hero">
+        <div class="hero-content">
+            <h1>About Mithila Hosieries</h1>
+            <p>20 years of excellence in women's and kids' innerwear, proudly Made in India.</p>
+        </div>
+    </section>
+
+    <section class="section chapter" id="our-story">
+        <div class="chapter-content">
+            <div class="text-content">
+                <h2>Our Journey</h2>
+                <p>Mithila Hosieries is a leading Indian manufacturer with two decades of rich experience in the production and distribution of high-quality inner garments for women and kids.</p>
+                <p>Our journey began with a commitment to comfort and quality, growing steadily through innovation and dedication to our craft. We leverage the latest technology to ensure efficient and superior production processes.</p>
+            </div>
+            <div class="visual-content">
+                <div class="visual-element">
+                    <!-- Updated image source with the new link -->
+                    <img src="https://i.postimg.cc/7CMQTqYm/temp-Imageik-Ch-Pv.avif" alt="Mithila Hosieries Journey Image" onerror="this.src='https://placehold.co/400x400/CCCCCC/000000?text=Image+Load+Error';">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section chapter" id="quality-distribution">
+        <div class="chapter-content">
+            <div class="visual-content">
+                <div class="visual-element"></div>
+            </div>
+            <div class="text-content">
+                <h2>Uncompromised Quality & Wide Reach</h2>
+                <p>Quality is at the core of everything we do. We meticulously select only the finest 100% cotton fibers to create products that are soft, comfortable, and exceptionally durable. Each garment undergoes rigorous checks at every stage, from raw material procurement to the final product.</p>
+                <p>With a robust distribution network spanning over 1000 distributors and retailers, our products are readily available across major cities and towns throughout India, offered at competitive prices.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section chapter" id="mission-vision">
+        <div class="chapter-content">
+            <div class="text-content">
+                <h2>Our Guiding Principles</h2>
+                <p><strong>Mission:</strong> To continuously innovate and enhance the quality and design of our innerwear, setting new benchmarks in the industry.</p>
+                <p><strong>Vision:</strong> To craft perfect products utilizing 21st-century technologies, always staying abreast of market trends and consumer needs.</p>
+                <p>We believe in valuing our employees, ensuring fair compensation for their hard work, as their dedication is instrumental in our success.</p>
+            </div>
+            <div class="visual-content">
+                <div class="visual-element"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section ending" id="contact">
+        <div class="ending-content">
+            <h2>Connect With Us</h2>
+            <p>Email: <a href="mailto:mithilahosieries@gmail.com" style="color: #4ecdc4; text-decoration: none;">mithilahosieries@gmail.com</a></p>
+            <p>Phone and WhatsApp: <a href="https://wa.me/919443460724" target="_blank" style="color: #4ecdc4; text-decoration: none;">+919443460724</a></p>
+            <p>Address: 46.A(6) Kumaran Colony Extn., Rakkiyapalayam Road, Ammapalayam, Tirupur - 641652</p>
+        </div>
+    </section>
+
+    <script>
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Progress bar animation
+        gsap.to('.progress-fill', {
+            width: '100%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1
+            }
+        });
+
+        // Parallax background
+        gsap.to('.parallax-bg', {
+            y: '30%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1
+            }
+        });
+
+        // Mobile menu functionality
+        const menuToggle = document.querySelector('.menu-toggle');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const menuOverlay = document.querySelector('.menu-overlay');
+        const body = document.body;
+
+        function toggleMenu() {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
+
+        // Close mobile menu when clicking on menu items
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Hero animations (Original Hero and About Us Hero)
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: '#home', /* Original Hero */
+                start: 'top center',
+                end: 'bottom center',
+                toggleActions: 'play none none reverse'
+            }
+        })
+        .to('#home h1', {
+            opacity: 1,
+            y: 0,
+            duration: 1.2,
+            ease: 'power3.out'
+        })
+        .to('#home p', {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: 'power3.out'
+        }, '-=0.8');
+
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: '#about-us-hero', /* About Us Hero */
+                start: 'top center',
+                end: 'bottom center',
+                toggleActions: 'play none none reverse'
+            }
+        })
+        .to('#about-us-hero h1', {
+            opacity: 1,
+            y: 0,
+            duration: 1.2,
+            ease: 'power3.out'
+        })
+        .to('#about-us-hero p', {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: 'power3.out'
+        }, '-=0.8');
+
+        // Chapter animations (Applies to all sections with class 'chapter')
+        document.querySelectorAll('.chapter').forEach((chapter, index) => {
+            const textContent = chapter.querySelector('.text-content');
+            const visualContent = chapter.querySelector('.visual-content');
+            
+            // Create timeline for each chapter
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: chapter,
+                    start: 'top 80%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+
+            // Animate text content
+            tl.to(textContent, {
+                opacity: 1,
+                x: 0,
+                duration: 1,
+                ease: 'power3.out'
+            })
+            // Animate visual content
+            .to(visualContent, {
+                opacity: 1,
+                x: 0,
+                duration: 1,
+                ease: 'power3.out'
+            }, '-=0.7');
+
+            // Parallax effect for visual elements (still applies to the container)
+            gsap.to(chapter.querySelector('.visual-element'), {
+                y: '-50px',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: chapter,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1
+                }
+            });
+        });
+
+        // Ending section animation
+        gsap.to('.ending-content', {
+            opacity: 1,
+            scale: 1,
+            duration: 1.5,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.ending',
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            }
+        });
+
+        // Smooth scroll effect
+        gsap.to('body', {
+            scrollBehavior: 'smooth'
+        });
+
+        // Add hover effects
+        document.querySelectorAll('.visual-element').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                gsap.to(element, {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+                gsap.to(cursor, {
+                    scale: 2,
+                    duration: 0.3
+                });
+            });
+
+            element.addEventListener('mouseleave', () => {
+                gsap.to(element, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+                gsap.to(cursor, {
+                    scale: 1,
+                    duration: 0.3
+                });
+            });
+        });
+
+        // Page load animation
+        window.addEventListener('load', () => {
+            gsap.fromTo('body',
+                { opacity: 0 },
+                { opacity: 1, duration: 1 }
+            );
+        });
+    </script>
+</body>
+</html>
